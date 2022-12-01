@@ -1,7 +1,6 @@
 import pandas as pd
 import json
-
-CAPTIONS_PATH = "./Dataset/captions/"
+import config as Config
 
 group = ['dress', 'shirt', 'toptee']
 
@@ -9,12 +8,8 @@ group = ['dress', 'shirt', 'toptee']
 def preprocess_dataset(mode="train"):
     captions = []
     for i in range(3):
-        with open(CAPTIONS_PATH+'cap.'+group[i]+'.'+mode+'.json', 'r') as c:
+        with open(f"{Config.captions_path}/cap.{group[i]}.{mode}.json", 'r') as c:
             captions += json.loads(c.read())
-
-    # Reading example
-    #print(captions[1])
-    # {'target': 'B00BZ8GPVO', 'candidate': 'B008MTHLHQ', 'captions': ['is longer', 'is lighter and longer']}
 
     target = []
     candidate = []
@@ -25,12 +20,15 @@ def preprocess_dataset(mode="train"):
             candidate.append(captions[i]["candidate"])
             caption.append(captions[i]["captions"][j])
     
-    return pd.DataFrame({
+    df = pd.DataFrame({
         "target": target,
         "candidate": candidate,
-        "captions": caption
+        "caption": caption
     })
+
+    # Randomly shuffle
+    return df.sample(frac=1).reset_index(drop=True)
 
 # Test
 if __name__ == '__main__':
-    print(preprocess_dataset()["target"][0:5])
+    print(preprocess_dataset().sample(n=5))
