@@ -1,7 +1,7 @@
 from torch import nn
 import timm
 from transformers import DistilBertModel, DistilBertConfig
-import config as Config
+from config import Config
 
 
 class ImageEncoder(nn.Module):
@@ -27,7 +27,7 @@ class ImageEncoder(nn.Module):
 class TextEncoder(nn.Module):
     """
     We'll use DistilBERT as the text encoder.
-    # In the case of DistilBERT (and also BERT) the output hidden representation for each token is a vector with size 768.
+    In the case of DistilBERT (and also BERT) the output hidden representation for each token is a vector with size 768.
     """
     def __init__( self,
         model_name=Config.text_encoder_model, 

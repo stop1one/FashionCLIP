@@ -22,7 +22,7 @@ class Config:
 
     pretrained = True # for both image encoder and text encoder
     trainable = True # for both image encoder and text encoder
-    temperature = 1.0
+    temperature = 1.0 # Softmax parameter. exp(T*a(i))/sum{exp(T*a(i))}
 
     # image size
     size = 224
