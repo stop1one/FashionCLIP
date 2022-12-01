@@ -1,7 +1,7 @@
 from torch import nn
 import timm
 from transformers import DistilBertModel, DistilBertConfig
-from config import Config
+import config as Config
 
 
 class ImageEncoder(nn.Module):
