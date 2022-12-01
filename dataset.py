@@ -2,8 +2,7 @@ import os
 import cv2
 import torch
 import albumentations as Aug
-
-from config import Config
+import config as Config
 
 
 class FashionIQDataset(torch.utils.data.Dataset):
