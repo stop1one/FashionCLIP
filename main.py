@@ -12,26 +12,12 @@ import config as Config
 from dataset import FashionIQDataset, get_transforms
 from model import CLIPModel
 from utils import AvgMeter, get_lr
-
-
-def make_train_valid_dfs():
-    dataframe = pd.read_csv(f"{Config.captions_path}/captions.csv")
-    max_id = dataframe["id"].max() + 1 if not Config.debug else 100
-    image_ids = np.arange(0, max_id)
-    np.random.seed(42)
-    valid_ids = np.random.choice(
-        image_ids, size=int(0.2 * len(image_ids)), replace=False
-    )
-    train_ids = [id_ for id_ in image_ids if id_ not in valid_ids]
-    train_dataframe = dataframe[dataframe["id"].isin(train_ids)].reset_index(drop=True)
-    valid_dataframe = dataframe[dataframe["id"].isin(valid_ids)].reset_index(drop=True)
-    return train_dataframe, valid_dataframe
-
+from preprocess import preprocess_dataset
 
 def build_loaders(dataframe, tokenizer, mode):
     transforms = get_transforms(mode=mode)
     dataset = FashionIQDataset(
-        dataframe["image"].values,
+        list(zip(dataframe["target"], dataframe["candidate"])),
         dataframe["caption"].values,
         tokenizer=tokenizer,
         transforms=transforms,
@@ -80,11 +66,11 @@ def valid_epoch(model, valid_loader):
 
 
 def main():
-    train_df, valid_df = make_train_valid_dfs()
+    train_df = preprocess_dataset("train")
+    valid_df = preprocess_dataset("val")
     tokenizer = DistilBertTokenizer.from_pretrained(Config.text_tokenizer)
     train_loader = build_loaders(train_df, tokenizer, mode="train")
     valid_loader = build_loaders(valid_df, tokenizer, mode="valid")
-
 
     model = CLIPModel().to(Config.device)
     optimizer = torch.optim.AdamW(
