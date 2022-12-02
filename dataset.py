@@ -58,4 +58,15 @@ def get_transforms(mode="train"):
             ]
         )
 
-    
+# Dataset Load Test
+if __name__ == "__main__":
+    from preprocess import preprocess_dataset
+    df = preprocess_dataset()
+    print("complete to load dataset")
+    image_filenames = list(zip(df["target"], df["candidate"]))
+    print(f"image: {image_filenames[0][0]}")
+    idx = 0
+    test_img = cv2.imread(f"{Config.image_path}/{image_filenames[idx][0]}.png")
+    cv2.imshow("test-image", test_img)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
