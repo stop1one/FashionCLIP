@@ -22,7 +22,7 @@ class CLIPModel(nn.Module):
 
     def forward(self, batch):
         # Getting Image and Text Features
-        target_image_features = self.image_encoder(batch["target_image"])
+        target_image_features = self.image_encoder(batch["target_image"])       # 32 * 3 * 224 * 224
         candidate_image_features = self.image_encoder(batch["candidate_image"])
         text_features = self.text_encoder(
             input_ids=batch["input_ids"], attention_mask=batch["attention_mask"]
