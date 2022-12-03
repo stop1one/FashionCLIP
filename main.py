@@ -27,6 +27,7 @@ def build_loaders(dataframe, tokenizer, mode):
         batch_size=Config.batch_size,
         num_workers=Config.num_workers,
         shuffle=True if mode == "train" else False,
+        drop_last = True
     )
     return dataloader
 

@@ -6,7 +6,6 @@ import cv2
 import math
 from transformers import DistilBertTokenizer
 from tqdm import tqdm
-import numpy as np
 
 import config as Config
 from model import CLIPModel
@@ -30,6 +29,7 @@ def get_image_embeddings(model_path):
         batch_size=Config.batch_size,
         num_workers=Config.num_workers,
         shuffle=False,
+        drop_last = True
     )
     
     model = CLIPModel().to(Config.device)
@@ -59,6 +59,8 @@ def get_candidate_embedding(model, candidate_image):
     candidate_embedding = model.image_projection(candidate_features)
 
     return candidate_embedding
+
+# target_embedding: torch.Size([31728, 256]) 992 / candidate_embedding: torch.Size([31744, 256])
 
 def find_matches(model, target_embeddings, length, candidate_image, caption, image_filenames, n=9):
     # caption process
@@ -110,12 +112,12 @@ def find(test_caption, test_image_filename):
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
-    valid_df = preprocess_dataset("val")
-    model, target_embeddings, length = get_image_embeddings(valid_df, "best.pt")
+    test_df = preprocess_dataset("test")
+    model, target_embeddings, length = get_image_embeddings("best.pt")
     find_matches(model,
                 target_embeddings,
                 length,
                 caption=test_caption,
                 candidate_image=test_image,
-                image_filenames=np.concatenate((valid_df['target'].values, valid_df['candidate'])),
+                image_filenames=test_df['target'].values,
                 n=9)
