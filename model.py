@@ -22,15 +22,19 @@ class CLIPModel(nn.Module):
 
     def forward(self, batch):
         # Getting Image and Text Features
-        image_features = self.image_encoder(batch["image"])
+        target_image_features = self.image_encoder(batch["target_image"])
+        candidate_image_features = self.image_encoder(batch["candidate_image"])
         text_features = self.text_encoder(
             input_ids=batch["input_ids"], attention_mask=batch["attention_mask"]
         )
+
         # Getting Image and Text Embeddings (with same dimension)
-        image_embeddings = self.image_projection(image_features)
+        target_image_embeddings = self.image_projection(target_image_features)
+        candidate_image_embeddings = self.image_projection(candidate_image_features)
         text_embeddings = self.text_projection(text_features)
 
         # Calculating the Loss (@: matrix multiplication)
+        image_embeddings = target_image_embeddings - candidate_image_embeddings # calculte difference
         logits = (text_embeddings @ image_embeddings.T) / self.temperature
         images_similarity = image_embeddings @ image_embeddings.T
         texts_similarity = text_embeddings @ text_embeddings.T
