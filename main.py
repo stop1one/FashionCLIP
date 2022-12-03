@@ -43,7 +43,7 @@ def train_epoch(model, train_loader, optimizer, lr_scheduler, step):
         if step == "batch":
             lr_scheduler.step()
 
-        count = batch["image"].size(0)
+        count = batch["target_image"].size(0)
         loss_meter.update(loss.item(), count)
 
         tqdm_object.set_postfix(train_loss=loss_meter.avg, lr=get_lr(optimizer))
@@ -58,7 +58,7 @@ def valid_epoch(model, valid_loader):
         batch = {k: v.to(Config.device) for k, v in batch.items() if k != "caption"}
         loss = model(batch)
 
-        count = batch["image"].size(0)
+        count = batch["target_image"].size(0)
         loss_meter.update(loss.item(), count)
 
         tqdm_object.set_postfix(valid_loss=loss_meter.avg)
