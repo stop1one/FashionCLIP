@@ -53,7 +53,7 @@ def cross_entropy(preds, targets, reduction='none'):
 
 # Test
 if __name__ == '__main__':
-    images = torch.randn(8, 3, 224, 224)    # batch_size, RGB, xdim, ydim
+    images = torch.randn(8, 3, 224, 224)    # batch_size, RGB(Channel), height, width
     input_ids = torch.randint(5, 300, size=(8, 25))
     attention_mask = torch.ones(8, 25)
     batch = {
