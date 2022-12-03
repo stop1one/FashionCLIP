@@ -5,13 +5,14 @@ import torch
 debug = False
 image_path = "./Dataset/images"
 captions_path = "./Dataset/captions"
+split_path = "./Dataset/image_splits"
 batch_size = 32
-num_workers = 4
+num_workers = 0
 lr = 1e-3
 weight_decay = 1e-3
 patience = 2
 factor = 0.5
-epochs = 5
+epochs = 1
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 model_name = 'resnet50'
