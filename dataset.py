@@ -25,14 +25,16 @@ class FashionIQDataset(torch.utils.data.Dataset):
             for key, values in self.encoded_captions.items()
         }
 
-        images = []
-        img_vec = []     # 0: target, 1: candidate
-        for i in range(2):
-            images.append(cv2.imread(f"{Config.image_path}/{self.image_filenames[idx][i]}.png"))
-            images[i] = cv2.cvtColor(images[i], cv2.COLOR_BGR2RGB)
-            images[i] = self.transforms(image=images[i])['image']
-            img_vec.append(torch.tensor(images[i]).permute(2, 0, 1).float())
-        item['image'] = img_vec[0] - img_vec[1]     # target - candidate
+        target_images = cv2.imread(f"{Config.image_path}/{self.image_filenames[idx][0]}.png")
+        target_images = cv2.cvtColor(target_images, cv2.COLOR_BGR2RGB)
+        target_images = self.transforms(image=target_images)['image']
+        item['target_image'] = torch.tensor(target_images).permute(2, 0, 1).float()
+
+        candidate_images = cv2.imread(f"{Config.image_path}/{self.image_filenames[idx][1]}.png")
+        candidate_images = cv2.cvtColor(candidate_images, cv2.COLOR_BGR2RGB)
+        candidate_images = self.transforms(image=candidate_images)['image']
+        item['candidate_image'] = torch.tensor(candidate_images).permute(2, 0, 1).float()
+        
         item['caption'] = self.captions[idx]
 
         return item
@@ -67,6 +69,22 @@ if __name__ == "__main__":
     print(f"image: {image_filenames[0][0]}")
     idx = 0
     test_img = cv2.imread(f"{Config.image_path}/{image_filenames[idx][0]}.png")
-    cv2.imshow("test-image", test_img)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    #cv2.imshow("test-image", test_img)
+    #cv2.waitKey(0)
+    #cv2.destroyAllWindows()
+
+    transforms = get_transforms("train")
+    target_images = cv2.imread(f"{Config.image_path}/{image_filenames[idx][0]}.png")
+    target_images = cv2.cvtColor(target_images, cv2.COLOR_BGR2RGB)
+    target_images = transforms(image=target_images)['image']
+    target = torch.tensor(target_images).permute(2, 0, 1).float()
+    candidate_images = cv2.imread(f"{Config.image_path}/{image_filenames[idx][1]}.png")
+    candidate_images = cv2.cvtColor(candidate_images, cv2.COLOR_BGR2RGB)
+    candidate_images = transforms(image=candidate_images)['image']
+    candidate = torch.tensor(candidate_images).permute(2, 0, 1).float()
+    print(target.size())
+    print(candidate.size())
+    tc = torch.stack((target, candidate), dim=0)
+    print(tc.size())
+    print(tc[0].size())
+    print(tc[1].size())    
