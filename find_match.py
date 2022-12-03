@@ -10,13 +10,27 @@ import numpy as np
 
 import config as Config
 from model import CLIPModel
-from main import build_loaders
 from preprocess import preprocess_dataset
-from dataset import get_transforms
+from dataset import FashionIQDataset, get_transforms
 
-def get_image_embeddings(valid_df, model_path):
+def get_image_embeddings(model_path):
     tokenizer = DistilBertTokenizer.from_pretrained(Config.text_tokenizer)
-    valid_loader = build_loaders(valid_df, tokenizer, mode="valid")
+    dataframe = preprocess_dataset("test")
+    transforms = get_transforms(mode="test")
+
+    dataset = FashionIQDataset(
+        list(zip(dataframe["target"], dataframe["candidate"])),
+        dataframe["caption"].values,
+        tokenizer=tokenizer,
+        transforms=transforms,
+    )
+
+    valid_loader = torch.utils.data.DataLoader(
+        dataset,
+        batch_size=Config.batch_size,
+        num_workers=Config.num_workers,
+        shuffle=False,
+    )
     
     model = CLIPModel().to(Config.device)
     model.load_state_dict(torch.load(model_path, map_location=Config.device))
@@ -25,16 +39,13 @@ def get_image_embeddings(valid_df, model_path):
     valid_image_embeddings = []
     with torch.no_grad():
         for batch in tqdm(valid_loader):
-            # target images
+            # target images = candidate_images
             target_image_features = model.image_encoder(batch["target_image"].to(Config.device))
             target_image_embeddings = model.image_projection(target_image_features)
             valid_image_embeddings.append(target_image_embeddings)
-        for batch in tqdm(valid_loader):
-            # candidate images
-            candidate_image_features = model.image_encoder(batch["candidate_image"].to(Config.device))
-            candidate_image_embeddings = model.image_projection(candidate_image_features)
-            valid_image_embeddings.append(candidate_image_embeddings)
+
     return model, torch.cat(valid_image_embeddings), len(valid_image_embeddings)
+
 
 def get_candidate_embedding(model, candidate_image):
     # cadidate image size = 3 * 224 * 224
