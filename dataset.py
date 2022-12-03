@@ -28,7 +28,7 @@ class FashionIQDataset(torch.utils.data.Dataset):
         images = []
         img_vec = []     # 0: target, 1: candidate
         for i in range(2):
-            images.append(cv2.imread(f"{Config.image_path}/{self.image_filenames[idx][0]}"))
+            images.append(cv2.imread(f"{Config.image_path}/{self.image_filenames[idx][i]}.png"))
             images[i] = cv2.cvtColor(images[i], cv2.COLOR_BGR2RGB)
             images[i] = self.transforms(image=images[i])['image']
             img_vec.append(torch.tensor(images[i]).permute(2, 0, 1).float())
@@ -63,7 +63,7 @@ if __name__ == "__main__":
     from preprocess import preprocess_dataset
     df = preprocess_dataset()
     print("complete to load dataset")
-    image_filenames = list(zip(df["target"], df["candidate"]))
+    image_filenames = list(zip(df["target"].values, df["candidate"].values))
     print(f"image: {image_filenames[0][0]}")
     idx = 0
     test_img = cv2.imread(f"{Config.image_path}/{image_filenames[idx][0]}.png")
