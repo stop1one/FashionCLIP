@@ -1,4 +1,4 @@
-# Fashion Item Recommendation Methodology using CLIP Architecture
+## Fashion Item Recommendation Methodology using CLIP Architecture
 <p align="center">
   <img src="Design.png" width="750" title="Architecture" alt="">
 </p>
